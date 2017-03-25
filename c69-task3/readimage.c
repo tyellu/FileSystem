@@ -33,8 +33,33 @@ void printbm(unsigned char * bitmap, unsigned int num_bytes) {
         printf("%d", (buf >> j) & 1);
       }
       p++;
-    }      
+    }
+    printf("\n");      
 }
+
+
+void getempty_bit(unsigned char * bitmap, unsigned int num_bytes){
+  int i, j;
+  unsigned char * p = bitmap;
+  unsigned char buf;
+  for (i = 0; i < num_bytes; i++){
+    buf = *p;
+    int found = 0;
+    for (j = 0; j < 8; j++) {
+      if(((buf >> j) & 1) == 0){
+        printf("%d\n", (j+(i*8)));
+        found = 1;
+        break;
+      }
+    }    
+    if(found){
+      break;
+    }
+    p++;
+  }
+}
+
+
 
 
 
@@ -62,7 +87,33 @@ int main(int argc, char **argv) {
     printf("Block bitmap:");
     unsigned char * bm = (unsigned char *)(disk + 1024 * gd->bg_block_bitmap);
     printbm(bm, (sb->s_blocks_count / 8));
-
-    
+    getempty_bit(bm, (sb->s_blocks_count / 8));
+    // inode map
+    printf("\nInode bitmap:");
+    bm = (unsigned char *) (disk + 1024 * gd->bg_inode_bitmap);
+    printbm(bm, sb->s_blocks_count / 32);
+    getempty_bit(bm, (sb->s_blocks_count / 32));
+    struct ext2_inode *inode = (struct ext2_inode *) ((disk+ (1024*5)) + (128));
+    char type;
+    if (inode->i_mode & EXT2_S_IFREG) {
+      type = 'f';
+    } else if (inode->i_mode & EXT2_S_IFDIR) {
+      type = 'd';
+    }
+    printf("[%d] type: %c size: %d links: %d blocks: %d\n", 2, type, inode->i_size, inode->i_links_count, inode->i_blocks);
+    int block_count = inode->i_blocks / 2;
+    int blocks;
+    // for (int j = 0; j < block_count; j++) {
+    //   if (j > 11) {
+    //     break;
+    //   }
+    //   blocks  = inode->i_block[j];
+    // }
+    blocks  = inode->i_block[0];
+    printf("[%d] Blocks:  %d\n", 2, blocks);
+    struct ext2_dir_entry_2 *root = (struct ext2_dir_entry_2 *)(disk + (1024*blocks));
+    printf("Inode: %d rec_len : %hu name : %s \n", root->inode, root->rec_len, root->name);
+    struct ext2_dir_entry_2 *root2 = (struct ext2_dir_entry_2 *)(disk + (1024*blocks+12));
+    printf("Inode: %d rec_len : %hu name : %s \n", root2->inode, root2->rec_len, root2->name);
     return 0;
 }
