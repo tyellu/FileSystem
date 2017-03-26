@@ -32,6 +32,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/mman.h>
+//should use this instead of defining true and false
+//#include <stdbool.h>
 #include <errno.h>
 
 #define true 1;
@@ -251,6 +253,7 @@ bool valid_path(char fp);
 inode *traverse_path(char *filepath, unsigned char *disk);
 void print_dir(inode *dir);
 void separate(char* path, char* name);
+int abscheck (char* path);
 
 
 #endif

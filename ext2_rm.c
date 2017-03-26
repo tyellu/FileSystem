@@ -15,14 +15,13 @@ int main(int argc, char **argv){
 	char* filepath = argv[2];
 
 	if (abscheck(filepath)){
-		perror("Error: ");
 		exit(1);
 	}
 }
 
 int abscheck (char* path){
 	if (path[0] != '/'){
-		fprintf(stderr, "file path must be absolute path\n");
+		fprintf(stderr, "Error: file path must be absolute path\n");
 		return 1;
 	} else {
 		return 0;
