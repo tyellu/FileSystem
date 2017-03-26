@@ -58,3 +58,18 @@ inode *traverse_path(char *filepath, unsigned char *disk){
 	return NULL;
 }
 
+void separate(char* path, char* name) {
+  int raw_len = strlen(path);
+  int i = raw_len - 1;
+  while (path[i] != '/') {
+    i--;
+  }
+  int name_len = raw_len - i - 1;
+  strncpy(name, path + raw_len - name_len, name_len + 1);
+  if (i == 0) { // preserve "/" special case
+    path[i + 1] = '\0';
+  } else {
+    path[i] = '\0';
+  }
+}
+
