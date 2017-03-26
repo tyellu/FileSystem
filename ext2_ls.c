@@ -38,8 +38,48 @@ int main(int argc, char *argv[])
 		filepath =  argv[2];
 	}
 
-	printf("%d\n",a_flag);
-	traverse_path(filepath, disk);
+	char fp[10000];
+	strncpy(fp, filepath, strlen(filepath));
+	inode *dir_inode = traverse_path(filepath, disk);
+
+	if(dir_inode != NULL && dir_inode->i_mode & EXT2_S_IFDIR){
+		dir_entry *curr_dir_entry;
+		unsigned short rec_len;
+		if(!a_flag){
+			curr_dir_entry = (dir_entry *)(disk + 
+				(EXT2_BLOCK_SIZE*(dir_inode->i_block[0]))+(24));
+			rec_len = 24;
+			while((rec_len > 0) && (rec_len < EXT2_BLOCK_SIZE)){
+				char name[EXT2_NAME_LEN + 1];
+			    strncpy(name, curr_dir_entry->name, curr_dir_entry->name_len);
+			    name[curr_dir_entry->name_len]= '\0';
+				printf("%s\n",name);
+				rec_len += curr_dir_entry->rec_len;
+				curr_dir_entry = (dir_entry *)(disk + 
+					(EXT2_BLOCK_SIZE*(dir_inode->i_block[0]))+(rec_len));
+			}
+			
+		}else{
+			curr_dir_entry = (dir_entry *)(disk + 
+				(EXT2_BLOCK_SIZE*(dir_inode->i_block[0])));
+			rec_len = 0;
+			while((rec_len >= 0) && (rec_len < EXT2_BLOCK_SIZE)){
+				char name[EXT2_NAME_LEN + 1];
+			    strncpy(name, curr_dir_entry->name, curr_dir_entry->name_len);
+			    name[curr_dir_entry->name_len]= '\0';
+				printf("%s\n",name);
+				rec_len += curr_dir_entry->rec_len;
+				curr_dir_entry = (dir_entry *)(disk + 
+					(EXT2_BLOCK_SIZE*(dir_inode->i_block[0]))+(rec_len));
+			
+			}	
+		}
+	}else if(dir_inode != NULL && dir_inode->i_mode & EXT2_S_IFREG){
+		printf("%s\n",fp);
+	}else{
+		printf("No such file or directory\n");
+		return ENOENT;
+	}
 
 
 	return 0;

@@ -21,6 +21,8 @@
 #define CSC369A3_EXT2_FS_H
 
 #define EXT2_BLOCK_SIZE 1024
+#define INODE_TBL_BLOCK 5
+#define INODE_STRUCT_SIZE 128
 
 #include <stdio.h>
 #include <unistd.h>
@@ -30,6 +32,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/mman.h>
+#include <errno.h>
 
 #define true 1;
 #define false 0;
@@ -109,7 +112,7 @@ typedef struct ext2_super_block {
 	unsigned int   s_default_mount_opts;
 	unsigned int   s_first_meta_bg; /* First metablock block group */
 	unsigned int   s_reserved[190]; /* Padding to the end of the block */
-}sb;
+}super_block;
 
 
 
@@ -128,7 +131,7 @@ typedef struct ext2_group_desc
 	unsigned short bg_used_dirs_count;   /* Directories count */
 	unsigned short bg_pad;
 	unsigned int   bg_reserved[3];
-}gd;
+}group_desc;
 
 
 
@@ -245,7 +248,8 @@ unsigned char *disk;
 
 //helper functions
 bool valid_path(char fp);
-void traverse_path(char *filepath, unsigned char *disk);
+inode *traverse_path(char *filepath, unsigned char *disk);
+void print_dir(inode *dir);
 
 
 
