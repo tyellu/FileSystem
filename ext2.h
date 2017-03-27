@@ -228,6 +228,21 @@ typedef struct ext2_dir_entry_2 {
 	char           name[];    /* File name, up to EXT2_NAME_LEN */
 }dir_entry;
 
+struct ext2_block_group{
+	uint32_t block_usage_m;    //Block usage bitmap address
+	uint32_t inode_usage_m;    //Inode usage bitmap address
+	uint32_t inode_table;      //Inode table starting address
+	uint16_t free_block_count; //Unused blocks in group
+	uint16_t free_inode_count; //Unused inodes in group
+	uint16_t directory_count;  //Directories in group
+}
+
+struct ext2_disk{
+	unint8_t *data;              //Where mmap reads into
+	struct ext2_superblock *sb;  //Superblock struct
+	struct ext2_block_group *bg; //Block group struck
+}
+
 /*
  * Ext2 directory file types.  Only the low 3 bits are used.  The
  * other bits are reserved for now.
