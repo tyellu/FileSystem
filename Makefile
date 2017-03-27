@@ -1,9 +1,7 @@
 CC=gcc
-CFLAGS= -g -Wall -Werror
-<<<<<<< HEAD
+CFLAGS= -g -Wall
+
 all : ext2_ls ext2_mkdir ext2_rm
-=======
->>>>>>> 7a04dd8fb48a1ae7f7bcf8ba93f72e4e09f3090b
 
 ext2_ls : ext2_ls.c ext2_func.o
 	$(CC) $(CFLAGS) ext2_func.o ext2_ls.c -o ext2_ls
