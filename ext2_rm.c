@@ -1,7 +1,6 @@
 #include "ext2.h"
 
 unsigned char *disk;
-int ftypecheck (char* path);
 
 int main(int argc, char **argv){
 
@@ -15,24 +14,19 @@ int main(int argc, char **argv){
 	int fd = open(argv[1], O_RDWR);
 	char* filepath = argv[2];
 
+	//Error check for absolue file path
 	if (abscheck(filepath)){
 		exit(1);
 	}
 
+	//Error check for file type non directory
 	if (ftypecheck(filepath)){
 		perror(filepath);
 		exit(1);
 	}
 }
 
-int abscheck (char* path){
-	if (path[0] != '/'){
-		fprintf(stderr, "Error: file path must be absolute path\n");
-		return 1;
-	} else {
-		return 0;
-	}
-}
+
 
 int ftypecheck (char* path){
 	if (path[strlen(path)-1]=='/'){

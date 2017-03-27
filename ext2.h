@@ -252,8 +252,8 @@ unsigned char *disk;
 bool valid_path(char fp);
 inode *traverse_path(char *filepath, unsigned char *disk);
 void print_dir(inode *dir);
-void separate(char* path, char* name);
+void splitname(char* path, char* filename);
 int abscheck (char* path);
-
+int ftypecheck (char* path);
 
 #endif
