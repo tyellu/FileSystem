@@ -57,39 +57,3 @@ inode *traverse_path(char *filepath, unsigned char *disk){
 	
 	return NULL;
 }
-
-void splitname(char* path, char* filename) {
-  int path_len = strlen(path);
-  int i = path_len - 1;
-  while (path[i] != '/') {
-    i--;
-  }
-  int name_len = path_len - i - 1;
-  strncpy(filename, path + path_len - name_len, name_len + 1);
-  if (i == 0) { // preserve "/" special case
-    path[i + 1] = '\0';
-  } else {
-    path[i] = '\0';
-  }
-}
-
-
-int abscheck (char* path){
-	if (path[0] != '/'){
-		fprintf(stderr, "Error: file path must be absolute path\n");
-		return 1;
-	} else {
-		return 0;
-	}
-}
-
-
-int ftypecheck (char* path){
-	if (path[strlen(path)-1]=='/'){
-		fprintf(stderr, "Error: ");
-		errno = EISDIR;
-		return 1;
-	} else{
-		return 0;
-	}
-}
