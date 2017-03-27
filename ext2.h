@@ -243,7 +243,7 @@ struct ext2_block_group{
 struct ext2_disk{
 	unsigned char *data;              //Where mmap reads into
 	struct ext2_super_block *sb;  //Superblock struct
-	struct ext2_block_group *bg; //Block group struck
+	struct ext2_block_group **bg; //Block group struck
 };
 
 /*
@@ -273,7 +273,8 @@ void separate(char* path, char* name);
 int abscheck (char* path);
 int get_unreserved_bit(unsigned char * bitmap, unsigned int num_bytes);
 struct ext2_super_block *read_superblock(unsigned char *data);
-struct ext2_disk *ext2_disk_read(const char *name);
+struct ext2_disk *read_disk(const char *name);
+struct ext2_inode *retrieve_inode(struct ext2_disk *disk, unsigned int block_adr, unsigned int inode_adr);
 
 
 #endif

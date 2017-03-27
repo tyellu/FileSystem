@@ -86,7 +86,7 @@ struct ext2_super_block *read_superblock(unsigned char *data){
 
 }
 
-struct ext2_disk *ext2_disk_read(const char *name){
+struct ext2_disk *read_disk(const char *name){
 	//ensure parameters are correct for the assignment
 	assert(sizeof(struct ext2_super_block) == 1024);
 	assert(sizeof(struct ext2_block_group)==32);
@@ -121,4 +121,11 @@ struct ext2_disk *ext2_disk_read(const char *name){
 
 	disk->bg = bgs;
 
+}
+
+struct ext2_inode *retrieve_inode(struct ext2_disk *disk, unsigned int block_adr, unsigned int inode_adr) {
+    // Find the byte address of the inode table
+    int byte_adr = 1024<<disk->sb->s_log_block_size * disk->bg[block_adr]->inode_table;
+
+    return (struct ext2_inode *) &disk->data[byte_adr + (inode_adr - 1) * disk->sb->s_inode_size];
 }
