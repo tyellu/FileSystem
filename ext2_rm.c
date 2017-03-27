@@ -2,7 +2,7 @@
 
 unsigned char *disk;
 
-void remove (struct )
+//void remove (struct )
 
 int main(int argc, char **argv){
 

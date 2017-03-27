@@ -19,4 +19,4 @@ ext2_func.o : ext2_func.c ext2.h
 	$(CC) $(CFLAGS) -c $<
 
 clean : 
-	rm -f *.o ext2_ls ext2_mkdir *~
+	rm -f *.o ext2_ls ext2_mkdir ext2_rm *~

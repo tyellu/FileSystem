@@ -58,21 +58,6 @@ inode *traverse_path(char *filepath, unsigned char *disk){
 	return NULL;
 }
 
-void separate(char* path, char* name) {
-  int raw_len = strlen(path);
-  int i = raw_len - 1;
-  while (path[i] != '/') {
-    i--;
-  }
-  int name_len = raw_len - i - 1;
-  strncpy(name, path + raw_len - name_len, name_len + 1);
-  if (i == 0) { // preserve "/" special case
-    path[i + 1] = '\0';
-  } else {
-    path[i] = '\0';
-  }
-}
-
 int get_unreserved_bit(unsigned char * bitmap, unsigned int num_bytes){
   int i, j;
   unsigned char * bm = bitmap;
@@ -89,4 +74,51 @@ int get_unreserved_bit(unsigned char * bitmap, unsigned int num_bytes){
   }
 
   return -1;
+}
+
+struct ext2_super_block *read_superblock(unsigned char *data){
+	struct ext2_super_block *superblock = (struct ext2_super_block *) (data + 1024);
+
+	if (superblock->s_magic != 0xef53)
+		errx(1, "Superblock signature (%#x) does not match expected ext2 value (%#x)", superblock->s_magic, 0x3f53);
+
+	return superblock;
+
+}
+
+struct ext2_disk *ext2_disk_read(const char *name){
+	//ensure parameters are correct for the assignment
+	assert(sizeof(struct ext2_super_block) == 1024);
+	assert(sizeof(struct ext2_block_group)==32);
+	assert(sizeof(struct ext2_inode) == 128);
+
+	struct ext2_disk *disk = malloc(sizeof(struct ext2_disk));
+	if (disk == NULL)
+		err(1, NULL);
+
+	int fd = open(name, O_RDWR);
+	if (fd==-1)
+		err(1, "%s could not be opened", name);
+
+	//Map the disk into memory using specifications as per the assignment handout
+	disk->data = mmap(NULL, 128 * 1024, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	if (disk->data == NULL)
+		err(1, "%s failed to map into memory", name);
+
+	//set the superblock
+	disk->sb = read_superblock(disk->data);
+
+	//get number of block groups (1 for this assignment)
+	int block_group_count = (disk->sb->s_blocks_count-1)/disk->sb->s_blocks_per_group;
+	assert (block_group_count ==
+		((disk->sb->s_inodes_count-1)/disk->sb->s_inodes_per_group));
+
+	struct ext2_block_group **bgs = malloc(block_group_count * sizeof(struct ext2_block_group));
+	int i;
+	for (i = 0; i < block_group_count; i++){
+		bgs[i]=(struct ext2_block_group *) &disk->data[2048+i*32];
+	}
+
+	disk->bg = bgs;
+
 }
