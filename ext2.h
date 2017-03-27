@@ -22,6 +22,7 @@
 
 #define EXT2_BLOCK_SIZE 1024
 #define INODE_TBL_BLOCK 5
+#define GD_BLOCK_INDEX 2
 #define INODE_STRUCT_SIZE 128
 
 #include <stdio.h>
@@ -266,6 +267,8 @@ unsigned char *disk;
 //helper functions
 bool valid_path(char fp);
 inode *traverse_path(char *filepath, unsigned char *disk);
-void print_dir(inode *dir);
+void separate(char* path, char* name);
+int abscheck (char* path);
+int get_unreserved_bit(unsigned char * bitmap, unsigned int num_bytes);
 
 #endif

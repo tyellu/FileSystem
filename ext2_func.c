@@ -57,3 +57,36 @@ inode *traverse_path(char *filepath, unsigned char *disk){
 	
 	return NULL;
 }
+
+void separate(char* path, char* name) {
+  int raw_len = strlen(path);
+  int i = raw_len - 1;
+  while (path[i] != '/') {
+    i--;
+  }
+  int name_len = raw_len - i - 1;
+  strncpy(name, path + raw_len - name_len, name_len + 1);
+  if (i == 0) { // preserve "/" special case
+    path[i + 1] = '\0';
+  } else {
+    path[i] = '\0';
+  }
+}
+
+int get_unreserved_bit(unsigned char * bitmap, unsigned int num_bytes){
+  int i, j;
+  unsigned char * bm = bitmap;
+  unsigned char bit;
+  for (i = 0; i < num_bytes; i++){
+    bit = *bm;
+    for (j = 0; j < 8; j++) {
+      if(((bit >> j) & 1) == 0){
+        // printf("%d\n", (j+(i*8)));
+        return(j+(i*8));
+      }
+    }    
+    bm++;
+  }
+
+  return -1;
+}
