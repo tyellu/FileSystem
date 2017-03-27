@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
 	}else if(dir_inode != NULL && dir_inode->i_mode & EXT2_S_IFREG){
 		printf("%s\n",fp);
 	}else{
-		printf("No such file or directory\n");
+		perror("No such file or directory\n");
 		return ENOENT;
 	}
 

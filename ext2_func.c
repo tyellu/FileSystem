@@ -73,3 +73,21 @@ void separate(char* path, char* name) {
   }
 }
 
+int get_unreserved_bit(unsigned char * bitmap, unsigned int num_bytes){
+  int i, j;
+  unsigned char * bm = bitmap;
+  unsigned char bit;
+  for (i = 0; i < num_bytes; i++){
+    bit = *bm;
+    for (j = 0; j < 8; j++) {
+      if(((bit >> j) & 1) == 0){
+        // printf("%d\n", (j+(i*8)));
+        return(j+(i*8));
+      }
+    }    
+    bm++;
+  }
+
+  return -1;
+}
+
