@@ -57,7 +57,7 @@ inode *traverse_path(char *filepath, unsigned char *disk){
 	
 	return NULL;
 }
-
+<<<<<<< HEAD
 void separate(char* path, char* name) {
   int raw_len = strlen(path);
   int i = raw_len - 1;
@@ -90,4 +90,5 @@ int get_unreserved_bit(unsigned char * bitmap, unsigned int num_bytes){
 
   return -1;
 }
-
+=======
+>>>>>>> 7a04dd8fb48a1ae7f7bcf8ba93f72e4e09f3090b

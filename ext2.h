@@ -253,9 +253,12 @@ unsigned char *disk;
 bool valid_path(char fp);
 inode *traverse_path(char *filepath, unsigned char *disk);
 void print_dir(inode *dir);
+<<<<<<< HEAD
 void separate(char* path, char* name);
 int abscheck (char* path);
 int get_unreserved_bit(unsigned char * bitmap, unsigned int num_bytes);
 
+=======
+>>>>>>> 7a04dd8fb48a1ae7f7bcf8ba93f72e4e09f3090b
 
 #endif
