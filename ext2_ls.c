@@ -48,16 +48,23 @@ int main(int argc, char *argv[])
 		unsigned short rec_len;
 		if(!a_flag){
 			curr_dir_entry = (dir_entry *)(disk + 
-				(EXT2_BLOCK_SIZE*(dir_inode->i_block[0]))+(24));
-			rec_len = 24;
-			while((rec_len > 0) && (rec_len < EXT2_BLOCK_SIZE)){
+				(EXT2_BLOCK_SIZE*(dir_inode->i_block[0])));
+			rec_len = 0;
+			while((rec_len >= 0) && (rec_len < EXT2_BLOCK_SIZE)){
 				char name[EXT2_NAME_LEN + 1];
 			    strncpy(name, curr_dir_entry->name, curr_dir_entry->name_len);
 			    name[curr_dir_entry->name_len]= '\0';
-				printf("%s\n",name);
-				rec_len += curr_dir_entry->rec_len;
-				curr_dir_entry = (dir_entry *)(disk + 
-					(EXT2_BLOCK_SIZE*(dir_inode->i_block[0]))+(rec_len));
+			    if((strncmp(name,".", strlen(".")) == 0) || (strncmp(name,"..", strlen("..")) == 0)){
+			    	rec_len += curr_dir_entry->rec_len;
+					curr_dir_entry = (dir_entry *)(disk + 
+						(EXT2_BLOCK_SIZE*(dir_inode->i_block[0]))+(rec_len));
+			    }else{
+			    	printf("%s\n",name);
+					rec_len += curr_dir_entry->rec_len;
+					curr_dir_entry = (dir_entry *)(disk + 
+						(EXT2_BLOCK_SIZE*(dir_inode->i_block[0]))+(rec_len));
+			    }
+
 			}
 			
 		}else{

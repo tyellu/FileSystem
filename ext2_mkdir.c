@@ -20,9 +20,9 @@ int main(int argc, char *argv[])
 		exit(1);
     }
 
-	struct ext2_super_block *sb = (struct ext2_super_block *)(disk + EXT2_BLOCK_SIZE);
+	super_block *sb = (struct ext2_super_block *)(disk + EXT2_BLOCK_SIZE);
 
-	struct ext2_group_desc *gd = ((struct ext2_group_desc *)(disk + (GD_BLOCK_INDEX*EXT2_BLOCK_SIZE)));
+	group_desc *gd = ((struct ext2_group_desc *)(disk + (GD_BLOCK_INDEX*EXT2_BLOCK_SIZE)));
 
 	unsigned char *block_bm = (unsigned char *)(disk + (EXT2_BLOCK_SIZE*gd->bg_block_bitmap));
 
