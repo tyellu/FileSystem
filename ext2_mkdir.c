@@ -1,12 +1,13 @@
 #include "ext2.h"
 
+unsigned char *disk;
 int main(int argc, char const *argv[])
 {
 	
-	const char *filepath = argv[2];
+	char *filepath = argv[2];
 
 	if (argc < 3) {
-        fprintf(stderr,"To run the program ./ext2_ls <image file name> <filepath> \n");
+        fprintf(stderr,"To run the program ./ext2_mkdir <image file name> <filepath> \n");
         return 1;
     }
 
@@ -37,6 +38,16 @@ int main(int argc, char const *argv[])
 	printf("block_index: %d\n",block_index);
 
 	printf("inode_index: %d\n",inode_index);
+
+
+	//get the inode struct corresponding to inode_index
+	inode *new_dir = (inode *)(disk + (EXT2_BLOCK_SIZE*INODE_TBL_BLOCK) + (INODE_STRUCT_SIZE*inode_index));
+
+	char file_name[256];
+	char *path = file_to_remove;
+	split(path, file_name);
+
+	inode *dir_inode = traverse_path(filepath, disk);
 
 
 	return 0;
