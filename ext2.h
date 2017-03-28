@@ -198,10 +198,6 @@ typedef struct ext2_inode {
 /* First non-reserved inode for old ext2 filesystems */
 #define EXT2_GOOD_OLD_FIRST_INO 11
 
-
-
-
-
 /*
  * Structure of a directory entry
  */
@@ -247,6 +243,8 @@ typedef struct ext2_disk{
 	struct ext2_block_group **bg; //Block group struck
 }edisk;
 
+#define IS_DIR(inode)	((inode->i_mode & EXT2_S_IFDIR) == EXT2_S_IFDIR)
+
 /*
  * Ext2 directory file types.  Only the low 3 bits are used.  The
  * other bits are reserved for now.
@@ -272,7 +270,7 @@ int abscheck (char* path);
 int get_unreserved_bit(unsigned char * bitmap, unsigned int num_bytes);
 super_block *read_superblock(unsigned char *data);
 struct ext2_disk *read_disk(const char *name);
-struct ext2_inode *retrieve_inode(struct ext2_disk *disk, unsigned int block_adr, unsigned int inode_adr);
+struct ext2_inode *retrieve_inode(struct ext2_disk *disk, unsigned int inode_adr, unsigned int block_adr);
 void split(char* file_path, char* file_name);
 dir_entry *retrieve_directory_entry(edisk *disk, inode *parent_dir, const char *name);
 dir_entry *dir_next(edisk *disk, unsigned int block_count, dir_entry *prev_dir);

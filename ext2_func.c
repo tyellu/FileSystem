@@ -125,7 +125,9 @@ edisk *read_disk(const char *name){
 
 }
 
-inode *retrieve_inode(edisk *disk, unsigned int block_adr, unsigned int inode_adr) {
+
+inode *retrieve_inode(edisk *disk, unsigned int inode_adr, unsigned int block_adr) {
+	printf("running retrieve inode\n");
     // Find the byte address of the inode table
     int byte_adr = 1024<<disk->sb->s_log_block_size * disk->bg[block_adr]->inode_table;
 
@@ -160,7 +162,6 @@ dir_entry *retrieve_directory_entry(edisk *disk, inode *parent_dir, const char *
                 return entry;
         }
     }
-
     return entry;
 }
 
@@ -172,7 +173,6 @@ dir_entry *dir_next(edisk *disk, unsigned int block_count, dir_entry *prev_dir) 
         address = 1024<< disk->sb->s_log_block_size * block_count;
     } else {
     	uintptr_t prev_dir_addr = (uintptr_t)prev_dir-(uintptr_t) disk->data;
-
         address = prev_dir_addr + ((sizeof(prev_dir) + prev_dir->name_len + 3) & ~0x03);
     }
 
