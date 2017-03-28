@@ -39,6 +39,7 @@
 #include <errno.h>
 #include <assert.h>
 #include <err.h>
+#include <stdint.h>
 
 #define true 1;
 #define false 0;
@@ -198,10 +199,6 @@ typedef struct ext2_inode {
 /* First non-reserved inode for old ext2 filesystems */
 #define EXT2_GOOD_OLD_FIRST_INO 11
 
-
-
-
-
 /*
  * Structure of a directory entry
  */
@@ -232,20 +229,22 @@ typedef struct ext2_dir_entry_2 {
 	char           name[];    /* File name, up to EXT2_NAME_LEN */
 }dir_entry;
 
-struct ext2_block_group{
+typedef struct ext2_block_group{
 	unsigned int block_usage_m;    //Block usage bitmap address
 	unsigned int inode_usage_m;    //Inode usage bitmap address
 	unsigned int inode_table;      //Inode table starting address
 	unsigned short free_block_count; //Unused blocks in group
 	unsigned short free_inode_count; //Unused inodes in group
 	unsigned short directory_count;  //Directories in group
-};
+}block_group;
 
-struct ext2_disk{
+typedef struct ext2_disk{
 	unsigned char *data;              //Where mmap reads into
 	struct ext2_super_block *sb;  //Superblock struct
 	struct ext2_block_group **bg; //Block group struck
-};
+}edisk;
+
+#define IS_DIR(inode)	((inode->i_mode & EXT2_S_IFDIR) == EXT2_S_IFDIR)
 
 /*
  * Ext2 directory file types.  Only the low 3 bits are used.  The
@@ -272,8 +271,10 @@ int abscheck (char* path);
 int get_unreserved_bit(unsigned char * bitmap, unsigned int num_bytes);
 super_block *read_superblock(unsigned char *data);
 struct ext2_disk *read_disk(const char *name);
-struct ext2_inode *retrieve_inode(struct ext2_disk *disk, unsigned int block_adr, unsigned int inode_adr);
+struct ext2_inode *retrieve_inode(struct ext2_disk *disk, unsigned int inode_adr, unsigned int block_adr);
 void split(char* file_path, char* file_name);
+dir_entry *retrieve_directory_entry(edisk *disk, inode *parent_dir, const char *name);
+dir_entry *dir_next(edisk *disk, unsigned int block_count, dir_entry *prev_dir);
 
 
 #endif
