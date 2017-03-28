@@ -125,7 +125,7 @@ edisk *read_disk(const char *name){
 
 }
 
-struct ext2_inode *retrieve_inode(edisk *disk, unsigned int block_adr, unsigned int inode_adr) {
+inode *retrieve_inode(edisk *disk, unsigned int block_adr, unsigned int inode_adr) {
     // Find the byte address of the inode table
     int byte_adr = 1024<<disk->sb->s_log_block_size * disk->bg[block_adr]->inode_table;
 
@@ -150,19 +150,31 @@ void split(char* file_path, char* file_name) {
   }
 }
 
-struct ext2_directory_entry *retrieve_directory_entry(edisk *disk, inode *parent_dir, const char *name) {
+dir_entry *retrieve_directory_entry(edisk *disk, inode *parent_dir, const char *name) {
     dir_entry *entry = NULL;
-
-    // Iterate over the 12 direct block pointers
+    // check if name matches in 12 direct block pointers
     int i;
     for (i = 0; i < 12; i++) {
-        while ((entry = _next_directory_entry(disk, cwd->direct_blocks[i], entry))->inode_addr != 0) {
-            // Check if the name matches
-            if (strcmp(ENTRY_NAME(entry), name) == 0)
-                // Name matches; return this entry
+        while ((entry = dir_next(disk, parent_dir->i_block[i], entry))->inode != 0) {
+            if (strcmp(entry->name, name) == 0)
                 return entry;
         }
     }
 
     return entry;
+}
+
+dir_entry *dir_next(edisk *disk, unsigned int block_count, dir_entry *prev_dir) {
+    unsigned long address;
+
+    //find correct address for next directory
+    if (prev_dir == NULL) {
+        address = 1024<< disk->sb->s_log_block_size * block_count;
+    } else {
+    	uintptr_t prev_dir_addr = (uintptr_t)prev_dir-(uintptr_t) disk->data;
+
+        address = prev_dir_addr + ((sizeof(prev_dir) + prev_dir->name_len + 3) & ~0x03);
+    }
+
+    return (dir_entry *) &disk->data[address];
 }

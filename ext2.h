@@ -38,6 +38,7 @@
 #include <errno.h>
 #include <assert.h>
 #include <err.h>
+#include <stdint.h>
 
 #define true 1;
 #define false 0;
@@ -273,6 +274,8 @@ super_block *read_superblock(unsigned char *data);
 struct ext2_disk *read_disk(const char *name);
 struct ext2_inode *retrieve_inode(struct ext2_disk *disk, unsigned int block_adr, unsigned int inode_adr);
 void split(char* file_path, char* file_name);
+dir_entry *retrieve_directory_entry(edisk *disk, inode *parent_dir, const char *name);
+dir_entry *dir_next(edisk *disk, unsigned int block_count, dir_entry *prev_dir);
 
 
 #endif
