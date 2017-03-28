@@ -76,7 +76,7 @@ int get_unreserved_bit(unsigned char * bitmap, unsigned int num_bytes){
   return -1;
 }
 
-struct ext2_super_block *read_superblock(unsigned char *data){
+super_block *read_superblock(unsigned char *data){
 	struct ext2_super_block *superblock = (struct ext2_super_block *) (data + 1024);
 
 	if (superblock->s_magic != 0xef53)
@@ -102,7 +102,7 @@ struct ext2_disk *read_disk(const char *name){
 
 	//Map the disk into memory using specifications as per the assignment handout
 	disk->data = mmap(NULL, 128 * 1024, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-	if (disk->data == NULL)
+	if (disk->data == MAP_FAILED)
 		err(1, "%s failed to map into memory", name);
 
 	//set the superblock

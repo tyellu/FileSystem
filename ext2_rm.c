@@ -3,7 +3,8 @@
 unsigned char *disk;
 
 void remove (struct ext2_disk *disk, const char *file_to_remove){
-
+	inode *parent_directory = traverse_path(file_to_remove, disk->data);
+	
 }
 
 int main(int argc, char **argv){
