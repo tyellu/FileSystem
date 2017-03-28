@@ -89,7 +89,7 @@ super_block *read_superblock(unsigned char *data){
 struct ext2_disk *read_disk(const char *name){
 	//ensure parameters are correct for the assignment
 	assert(sizeof(struct ext2_super_block) == 1024);
-	assert(sizeof(struct ext2_block_group)==32);
+	//assert(sizeof(struct ext2_block_group)==32);
 	assert(sizeof(struct ext2_inode) == 128);
 
 	struct ext2_disk *disk = malloc(sizeof(struct ext2_disk));
@@ -121,6 +121,8 @@ struct ext2_disk *read_disk(const char *name){
 
 	disk->bg = bgs;
 
+	return disk;
+
 }
 
 struct ext2_inode *retrieve_inode(struct ext2_disk *disk, unsigned int block_adr, unsigned int inode_adr) {
@@ -137,6 +139,7 @@ void split(char* file_path, char* file_name) {
     i--;
   }
   int file_name_len = path_len - i - 1;
+
   strncpy(file_name, file_path + path_len - file_name_len, file_name_len + 1);
 
   //Set ending char accordingly, special case input '/'
