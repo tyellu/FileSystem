@@ -2,25 +2,6 @@
 
 unsigned char *disk;
 
-bool file_exists(unsigned char *disk, inode *parent_inode, char *file_name){
-	dir_entry *curr_dir_entry = (dir_entry *)(disk + 
-		(EXT2_BLOCK_SIZE*(parent_inode->i_block[0])));
-	unsigned short rec_len = curr_dir_entry->rec_len;
-	while((rec_len > 0) && (rec_len <= EXT2_BLOCK_SIZE)){
-		char name[EXT2_NAME_LEN + 1];
-		strncpy(name, curr_dir_entry->name, curr_dir_entry->name_len);
-		name[curr_dir_entry->name_len]= '\0';
-		if(strcmp(file_name, name) == 0){
-			return true;
-		}else{
-			curr_dir_entry = (dir_entry *)(disk + 
-		(EXT2_BLOCK_SIZE*(parent_inode->i_block[0]))+(rec_len));
-			rec_len += curr_dir_entry->rec_len;
-		}
-	}
-	return false;
-}
-
 int main(int argc, char *argv[])
 {
 	
@@ -53,19 +34,13 @@ int main(int argc, char *argv[])
 	//get unreserved inode index
 	int inode_index = get_unreserved_bit(inode_bm, (sb->s_blocks_count / 32));
 
-	printf("filepath: %s\n", filepath);
-
-	printf("block_index: %d\n",block_index);
-
-	printf("inode_index: %d\n",inode_index);
-
 
 	//get the inode struct corresponding to inode_index
 	inode *new_dir_inode = (inode *)(disk + (EXT2_BLOCK_SIZE*INODE_TBL_BLOCK) + (INODE_STRUCT_SIZE*inode_index));
 	new_dir_inode->i_mode = EXT2_FT_DIR;
 	new_dir_inode->i_size = EXT2_BLOCK_SIZE;
 	new_dir_inode->i_block[0] = block_index;
-	new_dir_inode->i_links_count = 2;
+	new_dir_inode->i_links_count = 1;
 	new_dir_inode->i_blocks = 2;
 
 	char file_name[256];
@@ -81,12 +56,12 @@ int main(int argc, char *argv[])
 			}else{
 
 			}
+		}else if(parent_inode != NULL && parent_inode->i_mode & EXT2_S_IFREG){
+			char parent_name[256];
+			char *ppath = path ;
+			split(ppath, parent_name);
+			printf("%s is not a valid directory\n",parent_name);
 		}
-	}else if(parent_inode != NULL && parent_inode->i_mode & EXT2_S_IFREG){
-		char parent_name[256];
-		char *ppath = path ;
-		split(ppath, parent_name);
-		printf("%s is not a valid directory\n",parent_name);
 	}else{
 		fprintf(stderr,"No such file or directory\n");
 		return ENOENT;
