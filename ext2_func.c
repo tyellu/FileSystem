@@ -61,12 +61,11 @@ inode *traverse_path(char *filepath, unsigned char *disk){
 int get_unreserved_bit(unsigned char * bitmap, unsigned int num_bytes){
   int i, j;
   unsigned char * bm = bitmap;
-  unsigned char bit;
+  unsigned char byte;
   for (i = 0; i < num_bytes; i++){
-    bit = *bm;
+    byte = *bm;
     for (j = 0; j < 8; j++) {
-      if(((bit >> j) & 1) == 0){
-        // printf("%d\n", (j+(i*8)));
+      if(((byte >> j) & 1) == 0){
         return(j+(i*8));
       }
     }    
@@ -74,6 +73,19 @@ int get_unreserved_bit(unsigned char * bitmap, unsigned int num_bytes){
   }
 
   return -1;
+}
+
+void flip_bit(unsigned char * bitmap, unsigned int num_bytes, int index){
+  int i, j;
+  unsigned char * bm = bitmap;
+  for (i = 0; i < num_bytes; i++){
+    for (j = 0; j < 8; j++) {
+      if((j+(i*8)) == index){
+        *bm = *bm ^ (1 << j);
+      }
+    }    
+    bm++;
+  }
 }
 
 super_block *read_superblock(unsigned char *data){
