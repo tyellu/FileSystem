@@ -2,3 +2,4 @@
 ext2_ls
 ext2_mkdir
 ext2_rm
+ext2_cp
