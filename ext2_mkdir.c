@@ -10,18 +10,18 @@ bool file_exists(unsigned char *disk, inode *parent_inode, char *file_name){
 		char name[EXT2_NAME_LEN + 1];
 		strncpy(name, curr_dir_entry->name, curr_dir_entry->name_len);
 		name[curr_dir_entry->name_len]= '\0';
-		if(strcmp(str, name) == 0){
+		if(strcmp(file_name, name) == 0){
 			return true;
 		}else{
 			curr_dir_entry = (dir_entry *)(disk + 
-		(EXT2_BLOCK_SIZE*(curr_inode->i_block[0]))+(rec_len));
+		(EXT2_BLOCK_SIZE*(parent_inode->i_block[0]))+(rec_len));
 			rec_len += curr_dir_entry->rec_len;
 		}
 	}
 	return false;
 }
 
-int main(int argc, char const *argv[])
+int main(int argc, char *argv[])
 {
 	
 	char *filepath = argv[2];
@@ -82,7 +82,7 @@ int main(int argc, char const *argv[])
 
 			}
 		}
-	}else if(dir_inode != NULL && dir_inode->i_mode & EXT2_S_IFREG){
+	}else if(parent_inode != NULL && parent_inode->i_mode & EXT2_S_IFREG){
 		char parent_name[256];
 		char *ppath = path ;
 		split(ppath, parent_name);
