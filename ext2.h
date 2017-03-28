@@ -263,8 +263,6 @@ struct ext2_disk{
 #define    EXT2_FT_MAX      8
 
 
-//Global Constants
-unsigned char *disk;
 
 //helper functions
 bool valid_path(char fp);
