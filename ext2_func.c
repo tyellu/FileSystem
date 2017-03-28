@@ -86,13 +86,13 @@ super_block *read_superblock(unsigned char *data){
 
 }
 
-struct ext2_disk *read_disk(const char *name){
+edisk *read_disk(const char *name){
 	//ensure parameters are correct for the assignment
 	assert(sizeof(struct ext2_super_block) == 1024);
 	//assert(sizeof(struct ext2_block_group)==32);
 	assert(sizeof(struct ext2_inode) == 128);
 
-	struct ext2_disk *disk = malloc(sizeof(struct ext2_disk));
+	edisk *disk = malloc(sizeof(struct ext2_disk));
 	if (disk == NULL)
 		err(1, NULL);
 
@@ -125,7 +125,7 @@ struct ext2_disk *read_disk(const char *name){
 
 }
 
-struct ext2_inode *retrieve_inode(struct ext2_disk *disk, unsigned int block_adr, unsigned int inode_adr) {
+struct ext2_inode *retrieve_inode(edisk *disk, unsigned int block_adr, unsigned int inode_adr) {
     // Find the byte address of the inode table
     int byte_adr = 1024<<disk->sb->s_log_block_size * disk->bg[block_adr]->inode_table;
 
@@ -148,4 +148,21 @@ void split(char* file_path, char* file_name) {
   }else{
   	file_path[i+1]='\0';
   }
+}
+
+struct ext2_directory_entry *retrieve_directory_entry(edisk *disk, inode *parent_dir, const char *name) {
+    dir_entry *entry = NULL;
+
+    // Iterate over the 12 direct block pointers
+    int i;
+    for (i = 0; i < 12; i++) {
+        while ((entry = _next_directory_entry(disk, cwd->direct_blocks[i], entry))->inode_addr != 0) {
+            // Check if the name matches
+            if (strcmp(ENTRY_NAME(entry), name) == 0)
+                // Name matches; return this entry
+                return entry;
+        }
+    }
+
+    return entry;
 }

@@ -4,7 +4,7 @@ unsigned char *disk;
 
 
 
-void remove_file (struct ext2_disk *disk, char *file_to_remove){
+void remove_file (struct ext2_disk *disk, const char *file_to_remove){
 
 	//split the given path
 	char file_name[256];
@@ -25,7 +25,7 @@ int main(int argc, char **argv){
 
 	char *image_file = argv[1];
     char *file_to_remove = argv[2];
-    struct ext2_disk *disk;
+    edisk *disk;
 
     disk=read_disk(image_file);
 

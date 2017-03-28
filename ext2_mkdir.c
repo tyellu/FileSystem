@@ -47,7 +47,7 @@ int main(int argc, char const *argv[])
 	char *path = file_to_remove;
 	split(path, file_name);
 
-	inode *dir_inode = traverse_path(filepath, disk);
+	inode *new_inode = traverse_path(path, disk);
 
 
 	return 0;
