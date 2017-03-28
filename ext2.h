@@ -263,7 +263,6 @@ struct ext2_disk{
 #define    EXT2_FT_MAX      8
 
 
-
 //helper functions
 bool valid_path(char fp);
 inode *traverse_path(char *filepath, unsigned char *disk);
