@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 	strncpy(fp, filepath, strlen(filepath));
 	inode *dir_inode = traverse_path(filepath, disk);
 
-	if(dir_inode != NULL && dir_inode->i_mode & EXT2_S_IFDIR){
+	if(dir_inode != NULL && (dir_inode->i_mode & EXT2_S_IFDIR)){
 		dir_entry *curr_dir_entry;
 		unsigned short rec_len;
 		if(!a_flag){

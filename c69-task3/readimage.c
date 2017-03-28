@@ -115,5 +115,11 @@ int main(int argc, char **argv) {
     printf("Inode: %d rec_len : %hu name : %s \n", root->inode, root->rec_len, root->name);
     struct ext2_dir_entry_2 *root2 = (struct ext2_dir_entry_2 *)(disk + (1024*blocks+12));
     printf("Inode: %d rec_len : %hu name : %s \n", root2->inode, root2->rec_len, root2->name);
+    struct ext2_inode *inode2 = (struct ext2_inode *) ((disk+ (1024*5)) + (128*12));
+    printf("[%d] type: %c size: %d links: %d blocks: %d\n", 2, type, inode2->i_size, inode2->i_links_count, inode2->i_blocks);
+    inode2->i_size = 1024;
+    inode2->i_links_count = 3;
+    inode2->i_blocks = 2;
+    printf("[%d] type: %c size: %d links: %d blocks: %d\n", 2, type, inode2->i_size, inode2->i_links_count, inode2->i_blocks);
     return 0;
 }

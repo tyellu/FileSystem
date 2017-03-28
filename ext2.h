@@ -24,6 +24,7 @@
 #define INODE_TBL_BLOCK 5
 #define GD_BLOCK_INDEX 2
 #define INODE_STRUCT_SIZE 128
+#define EXT2_INODE_COUNT 32
 
 #include <stdio.h>
 #include <unistd.h>
