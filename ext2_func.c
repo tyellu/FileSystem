@@ -129,3 +129,20 @@ struct ext2_inode *retrieve_inode(struct ext2_disk *disk, unsigned int block_adr
 
     return (struct ext2_inode *) &disk->data[byte_adr + (inode_adr - 1) * disk->sb->s_inode_size];
 }
+
+void split(char* file_path, char* file_name) {
+  int path_len = strlen(file_path);
+  int i = path_len - 1;
+  while (file_path[i] != '/') {
+    i--;
+  }
+  int file_name_len = path_len - i - 1;
+  strncpy(file_name, file_path + path_len - file_name_len, file_name_len + 1);
+
+  //Set ending char accordingly, special case input '/'
+  if (i > 0){
+  	file_path[i]='\0';
+  }else{
+  	file_path[i+1]='\0';
+  }
+}

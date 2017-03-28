@@ -275,6 +275,7 @@ int get_unreserved_bit(unsigned char * bitmap, unsigned int num_bytes);
 super_block *read_superblock(unsigned char *data);
 struct ext2_disk *read_disk(const char *name);
 struct ext2_inode *retrieve_inode(struct ext2_disk *disk, unsigned int block_adr, unsigned int inode_adr);
+void split(char* file_path, char* file_name);
 
 
 #endif

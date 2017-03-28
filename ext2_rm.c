@@ -2,9 +2,19 @@
 
 unsigned char *disk;
 
-void remove (struct ext2_disk *disk, const char *file_to_remove){
-	inode *parent_directory = traverse_path(file_to_remove, disk->data);
-	
+
+
+void remove_file (struct ext2_disk *disk, char *file_to_remove){
+
+	//split the given path
+	char file_name[256];
+	char *path = file_to_remove;
+
+	split(path, file_name);
+
+	// if ((inode *parent_directory = traverse_path(path, disk->data))==NULL)
+	// 	err(1)
+
 }
 
 int main(int argc, char **argv){
@@ -20,9 +30,9 @@ int main(int argc, char **argv){
 
     disk=read_disk(image_file);
 
-    remove (disk, file_to_remove);
+    remove_file (disk, file_to_remove);
 
-    assert((1024<<disk->superblock->s_log_block_size)==1024);
+    assert((1024<<disk->sb->s_log_block_size)==1024);
     
     return 0;
 
