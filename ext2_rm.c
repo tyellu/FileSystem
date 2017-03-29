@@ -3,59 +3,40 @@
 unsigned char *disk;
 
 
-void remove_file (unsigned char *disk, char *file_to_remove){
+void remove_file (unsigned char *disk, const char *file_to_remove){
 
 	//split the given path
 	char file_name[256];
 
-	char *path = file_to_remove;
+	//preserve the original file_to_remove
+	char *path = malloc(strlen(file_to_remove));
+	strcpy(path, file_to_remove);
 
 	inode *parent_directory;
 
+	//split the path and last component
 	split(path, file_name);
 
-	if ((parent_directory = traverse_path(path, disk))==NULL){
-		err(ENOENT, "%s: No such directory\n", path);
-	}else if (!strcmp(file_name, ".") || !strcmp(file_name,"..")){
-		err(1, "Cannot delete . or ..\n");
+	//Error check, cant delete '.' or '..'
+	if (!strcmp(file_name, ".") || !strcmp(file_name,"..")){
+		errx(1, "Cannot delete . or ..");
+	//Error check, directory must exist
+	} else if ((parent_directory = traverse_path(path, disk))==NULL){
+		errx(ENOENT, "%s : No such directory", path);
 	}
 
-
+	//create directory entry for file in parent directory
 	dir_entry *entry = file_exists(disk, parent_directory, file_name);
-	
+
+	//If it doesn't exist
 	if (entry == NULL){
-		err(ENOENT, "%s/%s No such file\n", path, file_name);
-	}else if (IS_DIR(retrieve_inode(disk, entry->inode))){
-		err(EISDIR, "%s/%s Path is to a directory\n", path, file_name);
+		errx(ENOENT, "%s : No such file", file_to_remove);
+	//If it isn't a regular file
+	}else if (!IS_FILE(retrieve_inode(disk, entry->inode))){
+		errx(EISDIR, "%s : Path is not to a regualr file", file_to_remove);
+	//Otherwise proceed with deleting
 	}else{
-		unsigned int inode = entry->inode;
-
-		entry->inode = 0;
-		entry->rec_len = 0;
-		entry->name_len =0;
-		entry->file_type = 0;
-		entry->name[0] = '\0';
-
-		if (--retrieve_inode(disk, entry->inode)->i_links_count == 0){
-		    int num_blocks = file_inode->i_blocks / 2;
-		    if (num_blocks > 12) {
-		      for (i = 0; i < 12; i++) {
-		        set_block_bitmap(block_bm_loc, file_inode->i_block[i] - 1, 0);
-		      }
-		      int master_block_idx = file_inode->i_block[12] - 1;
-		      set_block_bitmap(block_bm_loc, master_block_idx, 0);
-		      int* blocks = (void*)disk + EXT2_BLOCK_SIZE * (master_block_idx + 1);
-		      for (i = 0; i < num_blocks - 13; i++) {
-		        set_block_bitmap(block_bm_loc, *blocks - 1, 0);
-		        blocks++;
-		      }
-		    } else {
-		      for (i = 0; i < num_blocks; i++) {
-		        set_block_bitmap(block_bm_loc, file_inode->i_block[i] - 1, 0);
-		      }
-		    }
-		    set_inode_bitmap(inode_bm_loc, file_inode_idx, 0);
-		}
+		remove_inode(parent_directory, retrieve_inode(disk, entry->inode), file_name, disk);
 	}
 }
 
@@ -65,6 +46,11 @@ int main(int argc, char **argv){
         fprintf(stderr,"To run the program ./ext2_rm <image file name> <filepath> \n");
         return 1;
     }
+
+    if (argv[2][0] != '/'){
+    	errx(1, "Must be absolute path");
+    }
+
     char *filepath=argv[2];
 
     int fd = open(argv[1], O_RDWR);
@@ -74,8 +60,6 @@ int main(int argc, char **argv){
 		perror("mmap");
 		exit(1);
     }
-
-	//set the superblock
 
     remove_file (disk, filepath);
     

@@ -233,7 +233,7 @@ typedef struct ext2_dir_entry_2 {
 }dir_entry;
 
 
-#define IS_DIR(inode) ((inode->i_mode & EXT2_S_IFDIR) == EXT2_S_IFDIR)
+#define IS_FILE(inode) ((inode->i_mode & EXT2_S_IFREG) == EXT2_S_IFREG)
 
 /*
  * Ext2 directory file types.  Only the low 3 bits are used.  The
@@ -260,5 +260,6 @@ void split(char* file_path, char* file_name);
 dir_entry *file_exists(unsigned char *disk, inode *parent_inode, char *file_name);
 void flip_bit(unsigned char * bitmap, unsigned int num_bytes, int index);
 inode *retrieve_inode(unsigned char *disk, unsigned int inode_number);
-
+int remove_inode(inode * parent, inode * target, char *file_name, unsigned char *disk);
+void unset_bitmap(unsigned int * bitmap, int index);
 #endif
