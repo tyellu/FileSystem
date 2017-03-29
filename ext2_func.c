@@ -61,12 +61,11 @@ inode *traverse_path(char *filepath, unsigned char *disk){
 int get_unreserved_bit(unsigned char * bitmap, unsigned int num_bytes){
   int i, j;
   unsigned char * bm = bitmap;
-  unsigned char bit;
+  unsigned char byte;
   for (i = 0; i < num_bytes; i++){
-    bit = *bm;
+    byte = *bm;
     for (j = 0; j < 8; j++) {
-      if(((bit >> j) & 1) == 0){
-        // printf("%d\n", (j+(i*8)));
+      if(((byte >> j) & 1) == 0){
         return(j+(i*8));
       }
     }    
@@ -75,6 +74,20 @@ int get_unreserved_bit(unsigned char * bitmap, unsigned int num_bytes){
 
   return -1;
 }
+
+void flip_bit(unsigned char * bitmap, unsigned int num_bytes, int index){
+  int i, j;
+  unsigned char * bm = bitmap;
+  for (i = 0; i < num_bytes; i++){
+    for (j = 0; j < 8; j++) {
+      if((j+(i*8)) == index){
+        *bm = *bm ^ (1 << j);
+      }
+    }    
+    bm++;
+  }
+}
+
 
 void split(char* file_path, char* file_name) {
   int path_len = strlen(file_path);
@@ -94,21 +107,25 @@ void split(char* file_path, char* file_name) {
   }
 }
 
-bool file_exists(unsigned char *disk, inode *parent_inode, char *file_name){
-	dir_entry *curr_dir_entry = (dir_entry *)(disk + 
-		(EXT2_BLOCK_SIZE*(parent_inode->i_block[0])));
-	unsigned short rec_len = curr_dir_entry->rec_len;
-	while((rec_len > 0) && (rec_len <= EXT2_BLOCK_SIZE)){
-		char name[EXT2_NAME_LEN + 1];
-		strncpy(name, curr_dir_entry->name, curr_dir_entry->name_len);
-		name[curr_dir_entry->name_len]= '\0';
-		if(strcmp(file_name, name) == 0){
-			return true;
-		}else{
-			curr_dir_entry = (dir_entry *)(disk + 
-		(EXT2_BLOCK_SIZE*(parent_inode->i_block[0]))+(rec_len));
-			rec_len += curr_dir_entry->rec_len;
+dir_entry *file_exists(unsigned char *disk, inode *parent_inode, char *file_name){
+	for(int i=0; (i < ((parent_inode->i_blocks / 2)) && (i < 11)); i++){
+		dir_entry *curr_dir_entry = (dir_entry *)(disk + 
+			(EXT2_BLOCK_SIZE*(parent_inode->i_block[i])));
+		unsigned short rec_len = curr_dir_entry->rec_len;
+		while((rec_len > 0) && (rec_len <= EXT2_BLOCK_SIZE)){
+			char name[EXT2_NAME_LEN + 1];
+			strncpy(name, curr_dir_entry->name, curr_dir_entry->name_len);
+			name[curr_dir_entry->name_len]= '\0';
+			if(strcmp(file_name, name) == 0){
+				return curr_dir_entry;
+			}else{
+				curr_dir_entry = (dir_entry *)(disk + 
+			(EXT2_BLOCK_SIZE*(parent_inode->i_block[0]))+(rec_len));
+				rec_len += curr_dir_entry->rec_len;
+			}
 		}
 	}
-	return false;
+	return NULL;
 }
+
+

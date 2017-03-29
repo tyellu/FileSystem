@@ -25,6 +25,9 @@
 #define GD_BLOCK_INDEX 2
 #define INODE_STRUCT_SIZE 128
 #define EXT2_INODE_COUNT 32
+#define EXT2_DIR_ENTRY_SIZE 8
+
+#define align(x) (x + (4 -(x % 4)))
 
 #include <stdio.h>
 #include <unistd.h>
@@ -254,7 +257,7 @@ bool valid_path(char fp);
 inode *traverse_path(char *filepath, unsigned char *disk);
 int get_unreserved_bit(unsigned char * bitmap, unsigned int num_bytes);
 void split(char* file_path, char* file_name);
-bool file_exists(unsigned char *disk, inode *parent_inode, char *file_name);
-
+dir_entry *file_exists(unsigned char *disk, inode *parent_inode, char *file_name);
+void flip_bit(unsigned char * bitmap, unsigned int num_bytes, int index);
 
 #endif
