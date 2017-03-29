@@ -128,4 +128,8 @@ dir_entry *file_exists(unsigned char *disk, inode *parent_inode, char *file_name
 	return NULL;
 }
 
+inode *retrieve_inode(unsigned char *disk, unsigned int inode_number) {
+    inode *curr_inode = (inode *)(disk + (1024*5) + (128*(inode_number-1)));
+    return curr_inode;
+}
 

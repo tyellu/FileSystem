@@ -21,11 +21,38 @@
 #define CSC369A3_EXT2_FS_H
 
 #define EXT2_BLOCK_SIZE 1024
+#define INODE_TBL_BLOCK 5
+#define GD_BLOCK_INDEX 2
+#define INODE_STRUCT_SIZE 128
+#define EXT2_INODE_COUNT 32
+#define EXT2_DIR_ENTRY_SIZE 8
+
+#define align(x) (x + (4 -(x % 4)))
+
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+//should use this instead of defining true and false
+//#include <stdbool.h>
+#include <errno.h>
+#include <assert.h>
+#include <err.h>
+#include <stdint.h>
+
+#define true 1;
+#define false 0;
+
+typedef int bool;
 
 /*
  * Structure of the super block
  */
-struct ext2_super_block {
+typedef struct ext2_super_block {
 	unsigned int   s_inodes_count;      /* Inodes count */
 	unsigned int   s_blocks_count;      /* Blocks count */
 	unsigned int   s_r_blocks_count;    /* Reserved blocks count */
@@ -95,7 +122,7 @@ struct ext2_super_block {
 	unsigned int   s_default_mount_opts;
 	unsigned int   s_first_meta_bg; /* First metablock block group */
 	unsigned int   s_reserved[190]; /* Padding to the end of the block */
-};
+}super_block;
 
 
 
@@ -104,7 +131,7 @@ struct ext2_super_block {
 /*
  * Structure of a blocks group descriptor
  */
-struct ext2_group_desc
+typedef struct ext2_group_desc
 {
 	unsigned int   bg_block_bitmap;      /* Blocks bitmap block */
 	unsigned int   bg_inode_bitmap;      /* Inodes bitmap block */
@@ -114,7 +141,7 @@ struct ext2_group_desc
 	unsigned short bg_used_dirs_count;   /* Directories count */
 	unsigned short bg_pad;
 	unsigned int   bg_reserved[3];
-};
+}group_desc;
 
 
 
@@ -124,7 +151,7 @@ struct ext2_group_desc
  * Structure of an inode on the disk
  */
 
-struct ext2_inode {
+typedef struct ext2_inode {
 	unsigned short i_mode;        /* File mode */
 	unsigned short i_uid;         /* Low 16 bits of Owner Uid */
 	unsigned int   i_size;        /* Size in bytes */
@@ -143,7 +170,7 @@ struct ext2_inode {
 	unsigned int   i_dir_acl;     /* Directory ACL */
 	unsigned int   i_faddr;       /* Fragment address */
 	unsigned int   extra[3];
-};
+}inode;
 
 /*
  * Type field for file mode
@@ -175,10 +202,6 @@ struct ext2_inode {
 /* First non-reserved inode for old ext2 filesystems */
 #define EXT2_GOOD_OLD_FIRST_INO 11
 
-
-
-
-
 /*
  * Structure of a directory entry
  */
@@ -201,13 +224,16 @@ struct ext2_dir_entry {
  * file_type field.
  */
 
-struct ext2_dir_entry_2 {
+typedef struct ext2_dir_entry_2 {
 	unsigned int   inode;     /* Inode number */
 	unsigned short rec_len;   /* Directory entry length */
 	unsigned char  name_len;  /* Name length */
 	unsigned char  file_type;
 	char           name[];    /* File name, up to EXT2_NAME_LEN */
-};
+}dir_entry;
+
+
+#define IS_DIR(in) ((in->i_mode & EXT2_S_IFDIR) == EXT2_S_IFDIR)
 
 /*
  * Ext2 directory file types.  Only the low 3 bits are used.  The
@@ -226,7 +252,13 @@ struct ext2_dir_entry_2 {
 #define    EXT2_FT_MAX      8
 
 
-
-
+//helper functions
+bool valid_path(char fp);
+inode *traverse_path(char *filepath, unsigned char *disk);
+int get_unreserved_bit(unsigned char * bitmap, unsigned int num_bytes);
+void split(char* file_path, char* file_name);
+dir_entry *file_exists(unsigned char *disk, inode *parent_inode, char *file_name);
+void flip_bit(unsigned char * bitmap, unsigned int num_bytes, int index);
+inode *retrieve_inode(unsigned char *disk, unsigned int inode_number);
 
 #endif

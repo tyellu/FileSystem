@@ -259,5 +259,6 @@ int get_unreserved_bit(unsigned char * bitmap, unsigned int num_bytes);
 void split(char* file_path, char* file_name);
 dir_entry *file_exists(unsigned char *disk, inode *parent_inode, char *file_name);
 void flip_bit(unsigned char * bitmap, unsigned int num_bytes, int index);
+inode *retrieve_inode(unsigned char *disk, unsigned int inode_number);
 
 #endif
