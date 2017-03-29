@@ -20,6 +20,7 @@
 #ifndef CSC369A3_EXT2_FS_H
 #define CSC369A3_EXT2_FS_H
 
+#define maxchar 10000
 #define EXT2_BLOCK_SIZE 1024
 #define INODE_TBL_BLOCK 5
 #define GD_BLOCK_INDEX 2
