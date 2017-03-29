@@ -15,6 +15,9 @@ ext2_rm : ext2_rm.c ext2_func.o
 ext2_cp : ext2_cp.c ext2_func.o
 	$(CC) $(CFLAGS) ext2_func.o ext2_cp.c -o ext2_cp 
 
+ext2_ln : ext2_ln.c ext2_func.o
+	$(CC) $(CFLAGS) ext2_func.o ext2_ln.c -o ext2_ln 
+
 ext2_func.o : ext2_func.c ext2.h
 	$(CC) $(CFLAGS) -c ext2_func.c
 
