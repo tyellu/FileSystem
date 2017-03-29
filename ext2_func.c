@@ -192,21 +192,25 @@ dir_entry *dir_next(edisk *disk, unsigned int block_count, dir_entry *prev_dir) 
 }
 
 
-bool file_exists(unsigned char *disk, inode *parent_inode, char *file_name){
-	dir_entry *curr_dir_entry = (dir_entry *)(disk + 
-		(EXT2_BLOCK_SIZE*(parent_inode->i_block[0])));
-	unsigned short rec_len = curr_dir_entry->rec_len;
-	while((rec_len > 0) && (rec_len <= EXT2_BLOCK_SIZE)){
-		char name[EXT2_NAME_LEN + 1];
-		strncpy(name, curr_dir_entry->name, curr_dir_entry->name_len);
-		name[curr_dir_entry->name_len]= '\0';
-		if(strcmp(file_name, name) == 0){
-			return true;
-		}else{
-			curr_dir_entry = (dir_entry *)(disk + 
-		(EXT2_BLOCK_SIZE*(parent_inode->i_block[0]))+(rec_len));
-			rec_len += curr_dir_entry->rec_len;
+dir_entry *file_exists(unsigned char *disk, inode *parent_inode, char *file_name){
+	for(int i=0; (i < ((parent_inode->i_blocks / 2)) && (i < 11)); i++){
+		dir_entry *curr_dir_entry = (dir_entry *)(disk + 
+			(EXT2_BLOCK_SIZE*(parent_inode->i_block[i])));
+		unsigned short rec_len = curr_dir_entry->rec_len;
+		while((rec_len > 0) && (rec_len <= EXT2_BLOCK_SIZE)){
+			char name[EXT2_NAME_LEN + 1];
+			strncpy(name, curr_dir_entry->name, curr_dir_entry->name_len);
+			name[curr_dir_entry->name_len]= '\0';
+			if(strcmp(file_name, name) == 0){
+				return curr_dir_entry;
+			}else{
+				curr_dir_entry = (dir_entry *)(disk + 
+			(EXT2_BLOCK_SIZE*(parent_inode->i_block[0]))+(rec_len));
+				rec_len += curr_dir_entry->rec_len;
+			}
 		}
 	}
-	return false;
+	return NULL;
 }
+
+

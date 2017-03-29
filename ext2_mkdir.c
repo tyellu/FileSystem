@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 
 	if(parent_inode != NULL){
 		if(parent_inode->i_mode & EXT2_S_IFDIR){
-			if(file_exists(disk, parent_inode, dir_name)){
+			if(file_exists(disk, parent_inode, dir_name) != NULL){
 				return EEXIST;
 			}else{
 				dir_entry *curr_dir_entry = (dir_entry *)(disk + 

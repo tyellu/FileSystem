@@ -278,7 +278,7 @@ struct ext2_inode *retrieve_inode(struct ext2_disk *disk, unsigned int inode_adr
 void split(char* file_path, char* file_name);
 dir_entry *retrieve_directory_entry(edisk *disk, inode *parent_dir, const char *name);
 dir_entry *dir_next(edisk *disk, unsigned int block_count, dir_entry *prev_dir);
-bool file_exists(unsigned char *disk, inode *parent_inode, char *file_name);
+dir_entry *file_exists(unsigned char *disk, inode *parent_inode, char *file_name);
 void flip_bit(unsigned char * bitmap, unsigned int num_bytes, int index);
 
 
