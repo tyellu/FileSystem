@@ -229,22 +229,8 @@ typedef struct ext2_dir_entry_2 {
 	char           name[];    /* File name, up to EXT2_NAME_LEN */
 }dir_entry;
 
-typedef struct ext2_block_group{
-	unsigned int block_usage_m;    //Block usage bitmap address
-	unsigned int inode_usage_m;    //Inode usage bitmap address
-	unsigned int inode_table;      //Inode table starting address
-	unsigned short free_block_count; //Unused blocks in group
-	unsigned short free_inode_count; //Unused inodes in group
-	unsigned short directory_count;  //Directories in group
-}block_group;
 
-typedef struct ext2_disk{
-	unsigned char *data;              //Where mmap reads into
-	struct ext2_super_block *sb;  //Superblock struct
-	struct ext2_block_group **bg; //Block group struck
-}edisk;
-
-#define IS_DIR(inode)	((inode->i_mode & EXT2_S_IFDIR) == EXT2_S_IFDIR)
+#define IS_DIR(inode) ((inode->i_mode & EXT2_S_IFDIR) == EXT2_S_IFDIR)
 
 /*
  * Ext2 directory file types.  Only the low 3 bits are used.  The
@@ -266,15 +252,8 @@ typedef struct ext2_disk{
 //helper functions
 bool valid_path(char fp);
 inode *traverse_path(char *filepath, unsigned char *disk);
-void separate(char* path, char* name);
-int abscheck (char* path);
 int get_unreserved_bit(unsigned char * bitmap, unsigned int num_bytes);
-super_block *read_superblock(unsigned char *data);
-struct ext2_disk *read_disk(const char *name);
-struct ext2_inode *retrieve_inode(struct ext2_disk *disk, unsigned int inode_adr, unsigned int block_adr);
 void split(char* file_path, char* file_name);
-dir_entry *retrieve_directory_entry(edisk *disk, inode *parent_dir, const char *name);
-dir_entry *dir_next(edisk *disk, unsigned int block_count, dir_entry *prev_dir);
 bool file_exists(unsigned char *disk, inode *parent_inode, char *file_name);
 
 
