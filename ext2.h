@@ -252,6 +252,8 @@ typedef struct ext2_dir_entry_2 {
 
 #define    EXT2_FT_MAX      8
 
+//Global Var
+unsigned char *disk;
 
 //helper functions
 bool valid_path(char fp);
@@ -263,4 +265,5 @@ void flip_bit(unsigned char * bitmap, unsigned int num_bytes, int index);
 inode *retrieve_inode(unsigned char *disk, unsigned int inode_number);
 int remove_inode(inode * parent, inode * target, char *file_name, unsigned char *disk);
 void unset_bitmap(unsigned int * bitmap, int index);
+void printbm(unsigned char * bitmap, unsigned int num_bytes);
 #endif

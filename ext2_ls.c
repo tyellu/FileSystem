@@ -1,6 +1,5 @@
 #include "ext2.h"
 
-unsigned char *disk;
 
 int main(int argc, char *argv[])
 {

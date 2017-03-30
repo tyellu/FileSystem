@@ -210,3 +210,18 @@ void unset_bitmap(unsigned int * bitmap, int index) {
   bitmap += (index / EXT2_INODE_COUNT);
   *bitmap &= (unsigned int)( ~(1 << (index % EXT2_INODE_COUNT)) );
 }
+
+void printbm(unsigned char * bitmap, unsigned int num_bytes) {
+    int i, j;
+    unsigned char * p = bitmap;
+    unsigned char buf;
+    for (i = 0; i < num_bytes; i++) {
+      printf(" ");
+      buf = *p;
+      for (j = 0; j < 8; j++) {
+        printf("%d", (buf >> j) & 1);
+      }
+      p++;
+    }
+    printf("\n");      
+}

@@ -1,22 +1,5 @@
 #include "ext2.h"
 
-unsigned char *disk;
-
-void printbm(unsigned char * bitmap, unsigned int num_bytes) {
-    int i, j;
-    unsigned char * p = bitmap;
-    unsigned char buf;
-    for (i = 0; i < num_bytes; i++) {
-      printf(" ");
-      buf = *p;
-      for (j = 0; j < 8; j++) {
-        printf("%d", (buf >> j) & 1);
-      }
-      p++;
-    }
-    printf("\n");      
-}
-
 int main(int argc, char *argv[])
 {
 	
@@ -35,20 +18,26 @@ int main(int argc, char *argv[])
 		exit(1);
     }
 
+    //get the superblock, group_desc block, inode_bitmap, block_bitmap
 	super_block *sb = (struct ext2_super_block *)(disk + EXT2_BLOCK_SIZE);
-
 	group_desc *gd = ((struct ext2_group_desc *)(disk + (GD_BLOCK_INDEX*EXT2_BLOCK_SIZE)));
-
 	unsigned char *block_bm = (unsigned char *)(disk + (EXT2_BLOCK_SIZE*gd->bg_block_bitmap));
-
 	unsigned char *inode_bm = (unsigned char *)(disk + (EXT2_BLOCK_SIZE*gd->bg_inode_bitmap));
 
 	//get unreserved block index and reserve it
 	int block_index = get_unreserved_bit(block_bm, (sb->s_blocks_count / 8));
+	if(block_index == -1){
+		fprintf(stderr, "Disk out of memory\n");
+		return 0;
+	}
 	flip_bit(block_bm,(sb->s_blocks_count / 8), block_index);
 	// printbm(block_bm, (sb->s_blocks_count / 8));
 	//get unreserved inode index and reserve it
 	int inode_index = get_unreserved_bit(inode_bm, (sb->s_blocks_count / 32));
+	if(inode_index == -1){
+		fprintf(stderr, "Disk out of memory\n");
+		return 0;
+	}
 	flip_bit(inode_bm,(sb->s_blocks_count / 32), inode_index);
 	// printbm(inode_bm, (sb->s_blocks_count / 32));
 
@@ -60,7 +49,9 @@ int main(int argc, char *argv[])
 	new_dir_inode->i_block[0] = (block_index);
 	new_dir_inode->i_links_count = 1;
 	new_dir_inode->i_blocks = 2;
+	new_dir_inode-> i_dtime = 0;
 
+	//get dir_name and dirpath
 	char dir_name[256];
 	char *path = filepath;
 	split(path, dir_name);
@@ -101,6 +92,7 @@ int main(int argc, char *argv[])
 					new_dir_entry->file_type = EXT2_FT_DIR;
 					strncpy(new_dir_entry->name, dir_name, strlen(dir_name));
 				}else{
+					//extend the data block
 
 				}
 

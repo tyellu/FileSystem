@@ -1,8 +1,5 @@
 #include "ext2.h"
 
-unsigned char *disk;
-
-
 void remove_file (unsigned char *disk, const char *file_to_remove){
 
 	//split the given path
