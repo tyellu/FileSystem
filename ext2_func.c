@@ -107,7 +107,8 @@ void split(char* file_path, char* file_name) {
 }
 
 dir_entry *file_exists(unsigned char *disk, inode *parent_inode, char *file_name){
-	for(int i=0; (i < ((parent_inode->i_blocks / 2)) && (i < 11)); i++){
+	int i;
+	for(i=0; (i < ((parent_inode->i_blocks / 2)) && (i < 11)); i++){
 		dir_entry *curr_dir_entry = (dir_entry *)(disk + 
 			(EXT2_BLOCK_SIZE*(parent_inode->i_block[i])));
 		unsigned short rec_len = curr_dir_entry->rec_len;

@@ -65,7 +65,8 @@ int main(int argc, char *argv[])
 				return EEXIST;
 			}else{
 				dir_entry *curr_dir_entry;
-				for(int i=0; ((i < (parent_inode->i_blocks / 2)) && (i < 11)); i++){
+				int i;
+				for(i=0; ((i < (parent_inode->i_blocks / 2)) && (i < 11)); i++){
 					curr_dir_entry = (dir_entry *)(disk + 
 						(EXT2_BLOCK_SIZE*(parent_inode->i_block[i])));
 				}
@@ -101,7 +102,7 @@ int main(int argc, char *argv[])
 			char parent_name[256];
 			char *ppath = path ;
 			split(ppath, parent_name);
-			printf("%s is not a valid directory\n",parent_name);
+			fprintf(stderr,"%s is not a valid directory\n",parent_name);
 		}
 	}else{
 		fprintf(stderr,"No such file or directory\n");
