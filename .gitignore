@@ -4,3 +4,4 @@ ext2_mkdir
 ext2_rm
 ext2_cp
 *.txt
+ext2_ln
