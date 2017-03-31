@@ -56,6 +56,7 @@ int main(int argc, char *argv[])
     }
     flip_bit(inode_bm,(sb->s_blocks_count / 32), inode_index);
     // printbm(inode_bm, (sb->s_blocks_count / 32));
+    gd->bg_free_inodes_count -= 1;
 
     //get the inode struct corresponding to inode_index
     inode *new_file_inode = (inode *)(disk + (EXT2_BLOCK_SIZE*INODE_TBL_BLOCK) + (INODE_STRUCT_SIZE*inode_index));
@@ -113,7 +114,22 @@ int main(int argc, char *argv[])
                     strncpy(new_dir_entry->name, file_name, strlen(file_name));
                 }else{
                     //extend the data block
-
+                    int block_index = get_unreserved_bit(block_bm, (sb->s_blocks_count / 8));
+                    if(block_index == -1){
+                        fprintf(stderr, "Disk out of memory\n");
+                        return 0;
+                    }
+                    flip_bit(block_bm,(sb->s_blocks_count / 8), block_index);
+                    gd->bg_free_blocks_count -= 1;
+                    new_file_inode->i_block[block] = block_index;
+                    new_file_inode->i_blocks += 2;
+                    dir_entry *new_dir_entry = (dir_entry *)(disk + 
+                        (EXT2_BLOCK_SIZE*(parent_inode->i_block[block]))+ (prev_size+curr_dir_reclen));
+                    new_dir_entry->inode = (inode_index+1);
+                    new_dir_entry->rec_len = (unsigned short)(EXT2_BLOCK_SIZE);
+                    new_dir_entry->name_len = strlen(dir_name);
+                    new_dir_entry->file_type = EXT2_FT_DIR;
+                    strncpy(new_dir_entry->name, dir_name, strlen(dir_name));
                 }
 
             }
@@ -140,6 +156,7 @@ int main(int argc, char *argv[])
             exit(0);
         }
         flip_bit(block_bm,(sb->s_blocks_count / 8), block_index);
+        gd->bg_free_blocks_count -= 1;
         if(i < 11){
             new_file_inode->i_block[i]= block_index;
         }else{
