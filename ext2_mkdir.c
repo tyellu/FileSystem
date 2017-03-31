@@ -65,6 +65,8 @@ int main(int argc, char *argv[])
 	if(parent_inode != NULL){
 		if(parent_inode->i_mode & EXT2_S_IFDIR){
 			if(file_exists(disk, parent_inode, dir_name) != NULL){
+				flip_bit(inode_bm,(sb->s_blocks_count / 32), inode_index);
+                flip_bit(block_bm,(sb->s_blocks_count / 8), block_index);
 				fprintf(stderr, "Directory with the name %s, already exists\n", dir_name);
 				return EEXIST;
 			}else{
@@ -122,6 +124,7 @@ int main(int argc, char *argv[])
 			char *ppath = path ;
 			split(ppath, parent_name);
 			fprintf(stderr,"%s is not a valid directory\n",parent_name);
+			return ENOENT;
 		}
 	}else{
 		fprintf(stderr,"No such file or directory\n");
@@ -137,12 +140,22 @@ int main(int argc, char *argv[])
 
 	//second entry
 	curr_entry = (dir_entry *)(disk + (EXT2_BLOCK_SIZE*block_index) + 12);
-	curr_entry->inode = (inode_index+1);
 	curr_entry->rec_len = 1012;
 	curr_entry->name_len = strlen("..");
 	curr_entry->file_type = EXT2_FT_DIR;
 	curr_entry->name[0] = '.';
 	curr_entry->name[1] = '.';
+
+	if(strcmp(path, "/") == 0){
+		curr_entry->inode = 2;
+	}else{
+		char pp_name[256];
+		char *ppath = path ;
+		split(ppath, pp_name);
+		inode *pparent = traverse_path(ppath, disk);
+		dir_entry *pentry = file_exists(disk, pparent, pp_name);
+		curr_entry->inode = pentry->inode;
+	}
 
 	return 0;
 }

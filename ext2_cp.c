@@ -21,6 +21,10 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
+
+    char fp[10000];
+    strncpy(fp, filepath, strlen(filepath));
+
     //get filepath
     char dir_name[256];
     char *path = filepath;
@@ -66,8 +70,9 @@ int main(int argc, char *argv[])
     new_file_inode->i_links_count = 1;
     new_file_inode->i_blocks = req_blocks*2;
     new_file_inode-> i_dtime = 0;
+    int block_index;
     if(req_blocks > 11){
-        int block_index = get_unreserved_bit(block_bm, (sb->s_blocks_count / 8));
+        block_index = get_unreserved_bit(block_bm, (sb->s_blocks_count / 8));
         if(block_index == -1){
             fprintf(stderr, "Disk out of memory\n");
             exit(0);
@@ -77,15 +82,17 @@ int main(int argc, char *argv[])
     }
 
     //create a dir_entry in the parent
-    inode *parent_inode = traverse_path(path, disk);
+    inode *parent_inode = traverse_path(fp, disk);
     if(parent_inode != NULL){
         if(parent_inode->i_mode & EXT2_S_IFDIR){
             if(file_exists(disk, parent_inode,  file_name) != NULL){
+                flip_bit(inode_bm,(sb->s_blocks_count / 32), inode_index);
+                flip_bit(block_bm,(sb->s_blocks_count / 8), block_index);
                 fprintf(stderr, "File with the name %s, already exists\n", file_name);
                 return EEXIST;
             }else{
                 dir_entry *curr_dir_entry;
-		int i;
+                int i;
                 for(i=0; ((i < (parent_inode->i_blocks / 2)) && (i < 11)); i++){
                     curr_dir_entry = (dir_entry *)(disk + 
                         (EXT2_BLOCK_SIZE*(parent_inode->i_block[i])));

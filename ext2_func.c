@@ -119,9 +119,14 @@ dir_entry *file_exists(unsigned char *disk, inode *parent_inode, char *file_name
 			if(strcmp(file_name, name) == 0){
 				return curr_dir_entry;
 			}else{
-				curr_dir_entry = (dir_entry *)(disk + 
-			(EXT2_BLOCK_SIZE*(parent_inode->i_block[0]))+(rec_len));
-				rec_len += curr_dir_entry->rec_len;
+        if(curr_dir_entry->rec_len != 0){
+          curr_dir_entry = (dir_entry *)(disk + 
+            (EXT2_BLOCK_SIZE*(parent_inode->i_block[0]))+(rec_len));
+          rec_len += curr_dir_entry->rec_len;
+        }else{
+          return NULL; 
+        }
+
 			}
 		}
 	}

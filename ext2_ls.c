@@ -59,6 +59,7 @@ int main(int argc, char *argv[])
 						(EXT2_BLOCK_SIZE*(dir_inode->i_block[0]))+(rec_len));
 			    }else{
 			    	printf("%s\n",name);
+			    	printf("%d\n",curr_dir_entry->rec_len);
 					rec_len += curr_dir_entry->rec_len;
 					curr_dir_entry = (dir_entry *)(disk + 
 						(EXT2_BLOCK_SIZE*(dir_inode->i_block[0]))+(rec_len));
@@ -75,6 +76,7 @@ int main(int argc, char *argv[])
 			    strncpy(name, curr_dir_entry->name, curr_dir_entry->name_len);
 			    name[curr_dir_entry->name_len]= '\0';
 				printf("%s\n",name);
+				printf("%d\n",curr_dir_entry->rec_len);
 				rec_len += curr_dir_entry->rec_len;
 				curr_dir_entry = (dir_entry *)(disk + 
 					(EXT2_BLOCK_SIZE*(dir_inode->i_block[0]))+(rec_len));
