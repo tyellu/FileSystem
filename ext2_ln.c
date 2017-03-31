@@ -44,20 +44,11 @@ int main(int argc, char *argv[])
 	unsigned char *inode_bm = (unsigned char *)(disk + (EXT2_BLOCK_SIZE*gd->bg_inode_bitmap));
 
 	if (s_flag) {
-		//get unreserved block index and reserve it
-		int free_block_index = get_unreserved_bit(block_bm, (sb->s_blocks_count / 8));
-		if(free_block_index == -1){
-			fprintf(stderr, "Disk out of memory\n");
-			return 0;
-		}
-
-		flip_bit(block_bm,(sb->s_blocks_count / 8), free_block_index);
-		
 		//get unreserved inode index and reserve it
 		int free_inode_index = get_unreserved_bit(inode_bm, (sb->s_blocks_count / 32));
 		if(free_inode_index == -1){
 			fprintf(stderr, "Disk out of memory\n");
-			return 0;
+			exit(0);
 		}
 
 		flip_bit(inode_bm,(sb->s_blocks_count / 32), free_inode_index);
@@ -116,6 +107,7 @@ int main(int argc, char *argv[])
 								lnk_size += lnk_dir_entry->rec_len;
 							}
 						}
+
 						int lnk_dir_reclen = EXT2_DIR_ENTRY_SIZE + align(lnk_dir_entry->name_len);
 						int needed_reclen = EXT2_DIR_ENTRY_SIZE + align(strlen(link_name));
 						if(needed_reclen < lnk_dir_entry->rec_len) {
@@ -130,7 +122,19 @@ int main(int argc, char *argv[])
 						}
 					}
 
+					//write the filepath into a datablock
+					int *id_block = (int *)(disk + (EXT2_BLOCK_SIZE*new_link_inode->i_block[12]));
+					
+					//get unreserved block index and reserve it
+					int free_block_index = get_unreserved_bit(block_bm, (sb->s_blocks_count / 8));
+					if(free_block_index == -1){
+						fprintf(stderr, "Disk out of memory\n");
+						exit(0);
+					}
+					flip_bit(block_bm,(sb->s_blocks_count / 8), free_block_index);
 
+					new_link_inode->i_block[i] = free_block_index;
+					memcpy((disk + EXT2_BLOCK_SIZE*free_block_index), srcfilepath, strlen(srcfilepath));
 
 
 				} else if (lnk_parent_inode != NULL && lnk_parent_inode->i_mode & EXT2_S_IFREG) {
