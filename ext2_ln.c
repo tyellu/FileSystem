@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
 	bool s_flag = false;
 	int option;
 
-	if (!((argc == 3) || (argc == 4))) {
+	if (!((argc == 4) || (argc == 5))) {
         fprintf(stderr,"To run the program ./ext2_ln <image file name> <source filepath> <disk filepath> \n");
         return 1;
     }
@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 		exit(1);
     }
 
-	while((option = getopt(argc, argv, "s:")) != -1){
+	while((option = getopt(argc, argv, "s")) != -1){
 	    switch (option){
 	    case 's':
 	    	s_flag = true;
@@ -34,6 +34,8 @@ int main(int argc, char *argv[])
 	    }
 	}
 
+	char srcfp[10000];
+	strncpy(srcfp, srcfilepath, strlen(srcfilepath));
 
 	super_block *sb = (struct ext2_super_block *)(disk + EXT2_BLOCK_SIZE);
 
@@ -100,6 +102,8 @@ int main(int argc, char *argv[])
 					//when the destination of the link is a directory
 					if (file_exists(disk, lnk_parent_inode, link_name) != NULL) {
 						//error since the link location already has file by given name
+		                flip_bit(inode_bm,(sb->s_blocks_count / 32), free_inode_index);
+		                flip_bit(block_bm,(sb->s_blocks_count / 8), free_block_index);
 						fprintf(stderr, "File %s in link location already exists\n", link_name);
 						return EEXIST;
 
@@ -150,8 +154,11 @@ int main(int argc, char *argv[])
 						}
 					}
 
+					char full_path [10001] = "";
+					strncat(full_path, ".", 1);
+					strncat(full_path, srcfp, strlen(srcfp));
 					//write the filepath into a datablock
- 					memcpy((disk + EXT2_BLOCK_SIZE*free_block_index), srcfilepath, strlen(srcfilepath));
+ 					memcpy((disk + EXT2_BLOCK_SIZE*free_block_index), full_path, strlen(full_path));
  
 
 
