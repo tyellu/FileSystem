@@ -47,6 +47,8 @@ int main(int argc, char *argv[])
 
 	int free_block_index;
 
+	inode *new_link_inode;
+
 	inode *src_inode;
 	unsigned int src_inode_value;
 
@@ -68,7 +70,7 @@ int main(int argc, char *argv[])
  		flip_bit(block_bm,(sb->s_blocks_count / 8), free_block_index);
 
 		//get the inode struct corresponding to inode_index
-		inode *new_link_inode = (inode *)(disk + (EXT2_BLOCK_SIZE*INODE_TBL_BLOCK) + (INODE_STRUCT_SIZE*free_inode_index));
+		new_link_inode = (inode *)(disk + (EXT2_BLOCK_SIZE*INODE_TBL_BLOCK) + (INODE_STRUCT_SIZE*free_inode_index));
 		new_link_inode->i_mode = EXT2_S_IFLNK;
 		new_link_inode->i_size = EXT2_BLOCK_SIZE;
 		new_link_inode->i_block[0] = (free_block_index);
@@ -132,6 +134,19 @@ int main(int argc, char *argv[])
 							new_dir_entry->name_len = strlen(link_name);
 							new_dir_entry->file_type = EXT2_FT_SYMLINK;
 							strncpy(new_dir_entry->name, link_name, strlen(link_name));
+						} else {
+							//extend the data block
+							flip_bit(block_bm,(sb->s_blocks_count / 8), free_block_index);
+		                    gd->bg_free_blocks_count -= 1;
+        		            new_link_inode->i_block[block] = free_block_index;
+                		    new_link_inode->i_blocks += 2;
+		                    dir_entry *new_dir_entry = (dir_entry *)(disk + 
+        			                (EXT2_BLOCK_SIZE*(lnk_parent_inode->i_block[block]))+ (prev_size+lnk_dir_reclen));
+                    		new_dir_entry->inode = (free_inode_index+1);
+                    		new_dir_entry->rec_len = (unsigned short)(EXT2_BLOCK_SIZE);
+		                    new_dir_entry->name_len = strlen(link_name);
+        		            new_dir_entry->file_type = EXT2_FT_REG_FILE;
+                    		strncpy(new_dir_entry->name, link_name, strlen(link_name));
 						}
 					}
 
@@ -211,8 +226,23 @@ int main(int argc, char *argv[])
 							new_dir_entry->name_len = strlen(link_name);
 							new_dir_entry->file_type = EXT2_FT_REG_FILE;
 							strncpy(new_dir_entry->name, link_name, strlen(link_name));
+						} else {
+							//extend the data block
+							flip_bit(block_bm,(sb->s_blocks_count / 8), free_block_index);
+		                    gd->bg_free_blocks_count -= 1;
+        		            new_link_inode->i_block[block] = free_block_index;
+                		    new_link_inode->i_blocks += 2;
+		                    dir_entry *new_dir_entry = (dir_entry *)(disk + 
+        			                (EXT2_BLOCK_SIZE*(lnk_parent_inode->i_block[block]))+ (prev_size+lnk_dir_reclen));
+                    		new_dir_entry->inode = (free_inode_index+1);
+                    		new_dir_entry->rec_len = (unsigned short)(EXT2_BLOCK_SIZE);
+		                    new_dir_entry->name_len = strlen(link_name);
+        		            new_dir_entry->file_type = EXT2_FT_REG_FILE;
+                    		strncpy(new_dir_entry->name, link_name, strlen(link_name));
 						}
+
 					}
+
 
 				} else if (lnk_parent_inode != NULL && lnk_parent_inode->i_mode & EXT2_S_IFREG) {
 					//when the destination of the link is a file
