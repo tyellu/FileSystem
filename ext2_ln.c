@@ -57,7 +57,11 @@ int main(int argc, char *argv[])
 
 	//get the inode struct corresponding to inode_index
 	inode *new_link_inode = (inode *)(disk + (EXT2_BLOCK_SIZE*INODE_TBL_BLOCK) + (INODE_STRUCT_SIZE*free_inode_index));
-	new_link_inode->i_mode = EXT2_S_IFLNK;
+	if (s_flag) {
+		new_link_inode->i_mode = EXT2_S_IFLNK;
+	} else {
+		new_link_inode->i_mode = EXT2_S_IFREG;
+	}
 	new_link_inode->i_size = EXT2_BLOCK_SIZE;
 	new_link_inode->i_block[0] = (block_index);
 	new_link_inode->i_links_count = 1;
@@ -116,25 +120,11 @@ int main(int argc, char *argv[])
 								(EXT2_BLOCK_SIZE*(lnk_parent_inode->i_block[block-1])) + (prev_size + lnk_dir_reclen));
 							new_dir_entry->inode = (inode_index+1);
 							new_dir_entry->rec_len = (unsigned short)(EXT2_BLOCK_SIZE - (prev_size + lnk_dir_reclen));
-							new_dir_entry->name_len = strlen(link_name);
+							new_dir_entry->name_len = strlen(srcfilepath);
 							new_dir_entry->file_type = EXT2_FT_SYMLINK;
-							strncpy(new_dir_entry->name, link_name, strlen(link_name));
+							strncpy(new_dir_entry->name, srcfilepath, strlen(srcfilepath));
 						}
 					}
-
-					//write the filepath into a datablock
-					int *id_block = (int *)(disk + (EXT2_BLOCK_SIZE*new_link_inode->i_block[12]));
-					
-					//get unreserved block index and reserve it
-					int free_block_index = get_unreserved_bit(block_bm, (sb->s_blocks_count / 8));
-					if(free_block_index == -1){
-						fprintf(stderr, "Disk out of memory\n");
-						exit(0);
-					}
-					flip_bit(block_bm,(sb->s_blocks_count / 8), free_block_index);
-
-					new_link_inode->i_block[i] = free_block_index;
-					memcpy((disk + EXT2_BLOCK_SIZE*free_block_index), srcfilepath, strlen(srcfilepath));
 
 
 				} else if (lnk_parent_inode != NULL && lnk_parent_inode->i_mode & EXT2_S_IFREG) {
