@@ -81,18 +81,14 @@ int main(int argc, char *argv[])
 		new_link_inode-> i_dtime = 0;
 	}
 
-	char *srcpath = malloc(strlen(srcfilepath));
-	strcpy(srcpath, srcfilepath);
-
 	//get the name of the file to be linked to and path to it
 	char src_name[256];
+	char *srcpath = srcfilepath;
 	split(srcpath, src_name);
-
-	char *linkpath = malloc(strlen(diskfilepath));
-	strcpy(linkpath, diskfilepath);
 
 	//get the link file name and the path to it
 	char link_name[256];
+	char *linkpath = diskfilepath;
 	split(linkpath, link_name);
 
 	inode *src_parent_inode = traverse_path(srcpath, disk);
@@ -159,7 +155,7 @@ int main(int argc, char *argv[])
 					}
 
 					char full_path [10001] = "";
-					strncat(full_path, "/root", 5);
+					strncat(full_path, ".", 1);
 					strncat(full_path, srcfp, strlen(srcfp));
 					//write the filepath into a datablock
  					memcpy((disk + EXT2_BLOCK_SIZE*free_block_index), full_path, strlen(full_path));
@@ -168,10 +164,8 @@ int main(int argc, char *argv[])
 
 				} else if (lnk_parent_inode != NULL && lnk_parent_inode->i_mode & EXT2_S_IFREG) {
 					//when the destination of the link is a file
-					char *ppath = malloc(strlen(linkpath));
-					strcpy(ppath, linkpath);
-
 					char parent_name[256];
+					char *ppath = linkpath;
 					split(ppath, parent_name);
 					fprintf(stderr, "%s is not a valid directory\n", parent_name);
 					return EISDIR;
@@ -195,10 +189,8 @@ int main(int argc, char *argv[])
 
 				} else if (src_parent_inode != NULL && src_parent_inode->i_mode & EXT2_S_IFREG) {
 					//when parent directory of source file is a file
-					char *ppath1 = malloc(strlen(srcpath));
-					strcpy(ppath1, srcpath);
-
 					char parent_name1[256];
+					char *ppath1 = srcpath ;
 					split(ppath1, parent_name1);
 					fprintf(stderr, "%s is not a valid directory\n", parent_name1);
 					return EISDIR;
@@ -261,10 +253,8 @@ int main(int argc, char *argv[])
 
 				} else if (lnk_parent_inode != NULL && lnk_parent_inode->i_mode & EXT2_S_IFREG) {
 					//when the destination of the link is a file
-					char *ppath2 = malloc(strlen(linkpath));
-					strcpy(ppath2, linkpath);
-
 					char parent_name2[256];
+					char *ppath2 = linkpath;
 					split(ppath2, parent_name2);
 					fprintf(stderr, "%s is not a valid directory\n", parent_name2);
 					return EISDIR;
