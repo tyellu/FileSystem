@@ -181,7 +181,7 @@ int remove_inode(inode * parent_dir_inode, inode * target_file_inode, char *file
                     dir->inode - 1);
                     //unset bitmap for blocks
                     unset_bitmap((unsigned int *) (disk + EXT2_BLOCK_SIZE * block_bitmap), 
-                        target_file_inode->i_block[i] - 1);
+                        target_file_inode->i_block[i]);
 
                     //increment free blocks
                     for (j = 0; j < 12 && target_file_inode->i_block[j]; j++) {

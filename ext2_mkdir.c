@@ -55,9 +55,12 @@ int main(int argc, char *argv[])
 	new_dir_inode->i_blocks = 2;
 	new_dir_inode-> i_dtime = 0;
 
+
+	char *path = malloc(strlen(filepath));
+	strcpy(path, filepath);
+
 	//get dir_name and dirpath
 	char dir_name[256];
-	char *path = filepath;
 	split(path, dir_name);
 
 	inode *parent_inode = traverse_path(path, disk);
@@ -120,8 +123,10 @@ int main(int argc, char *argv[])
 
 			}
 		}else if(parent_inode != NULL && parent_inode->i_mode & EXT2_S_IFREG){
+			char *ppath = malloc(strlen(path));
+			strcpy(ppath, path);
+
 			char parent_name[256];
-			char *ppath = path ;
 			split(ppath, parent_name);
 			fprintf(stderr,"%s is not a valid directory\n",parent_name);
 			return ENOENT;
@@ -149,8 +154,10 @@ int main(int argc, char *argv[])
 	if(strcmp(path, "/") == 0){
 		curr_entry->inode = 2;
 	}else{
+		char *ppath = malloc(strlen(path));
+		strcpy(ppath, path);
+
 		char pp_name[256];
-		char *ppath = path ;
 		split(ppath, pp_name);
 		inode *pparent = traverse_path(ppath, disk);
 		dir_entry *pentry = file_exists(disk, pparent, pp_name);
