@@ -8,8 +8,15 @@ int main(int argc, char *argv[])
         fprintf(stderr,"To run the program ./ext2_cp <image file name> <native filepath> <disk filepath> \n");
         return 1;
     }
+    char native_path[5000]="";
 
-    char *native_path = argv[2];
+
+    if (strncmp (argv[2], "/", 1)!=0){
+    	strcpy(native_path, "/");
+    	strcat(native_path, argv[2]);
+    }else{
+    	strcat(native_path, argv[2]);
+    }
     char *filepath = argv[3];
 
 
@@ -25,13 +32,15 @@ int main(int argc, char *argv[])
     char fp[10000];
     strncpy(fp, filepath, strlen(filepath));
 
+	char *path = malloc(strlen(filepath));
+	strcpy(path, filepath);
+
     //get filepath
     char dir_name[256];
-    char *path = filepath;
     split(path, dir_name);
 
     //read file and get size and the calc the blocks required
-    int file_fd = open(native_path, O_RDONLY);
+    int file_fd = open(argv[2], O_RDONLY);
     int file_size = lseek(file_fd, 0, SEEK_END);
     int req_blocks = ((file_size - 1) / EXT2_BLOCK_SIZE) + 1;  
     unsigned char* src_file = mmap(NULL, file_size, PROT_READ, MAP_PRIVATE, file_fd, 0);
@@ -40,9 +49,11 @@ int main(int argc, char *argv[])
        exit(1);
     }    
 
+	char *path2 = malloc(strlen(native_path));
+	strcpy(path2, native_path); 
+
     //get filename
     char file_name[256];
-    char *path2 = native_path;
     split(path2, file_name);
 
     //get the superblock, group_desc block, inode_bitmap, block_bitmap
@@ -51,7 +62,7 @@ int main(int argc, char *argv[])
 	unsigned char *block_bm = (unsigned char *)(disk + (EXT2_BLOCK_SIZE*gd->bg_block_bitmap));
 	unsigned char *inode_bm = (unsigned char *)(disk + (EXT2_BLOCK_SIZE*gd->bg_inode_bitmap));
 
-    
+
     //get unreserved inode index and reserve it
     int inode_index = get_unreserved_bit(inode_bm, (sb->s_blocks_count / 32));
     if(inode_index == -1){
@@ -134,9 +145,9 @@ int main(int argc, char *argv[])
                         (EXT2_BLOCK_SIZE*(parent_inode->i_block[block]))+ (prev_size+curr_dir_reclen));
                     new_dir_entry->inode = (inode_index+1);
                     new_dir_entry->rec_len = (unsigned short)(EXT2_BLOCK_SIZE);
-                    new_dir_entry->name_len = strlen(dir_name);
-                    new_dir_entry->file_type = EXT2_FT_DIR;
-                    strncpy(new_dir_entry->name, dir_name, strlen(dir_name));
+                    new_dir_entry->name_len = strlen(file_name);
+                    new_dir_entry->file_type = EXT2_FT_REG_FILE;
+                    strncpy(new_dir_entry->name, file_name, strlen(file_name));
                 }
 
             }
