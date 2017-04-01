@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
 					}
 
 					char full_path [10001] = "";
-					strncat(full_path, ".", 1);
+					strncat(full_path, "/root", 5);
 					strncat(full_path, srcfp, strlen(srcfp));
 					//write the filepath into a datablock
  					memcpy((disk + EXT2_BLOCK_SIZE*free_block_index), full_path, strlen(full_path));
