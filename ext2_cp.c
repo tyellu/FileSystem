@@ -98,7 +98,9 @@ int main(int argc, char *argv[])
         if(parent_inode->i_mode & EXT2_S_IFDIR){
             if(file_exists(disk, parent_inode,  file_name) != NULL){
                 flip_bit(inode_bm,(sb->s_blocks_count / 32), inode_index);
-                flip_bit(block_bm,(sb->s_blocks_count / 8), block_index);
+                if(req_blocks > 11){
+                    flip_bit(block_bm,(sb->s_blocks_count / 8), block_index);
+                }
                 fprintf(stderr, "File with the name %s, already exists\n", file_name);
                 return EEXIST;
             }else{
